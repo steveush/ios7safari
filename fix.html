@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta name="viewport" content="width = device-width, initial-scale = 1.0, minimum-scale = 1.0, maximum-scale = 1.0, user-scalable = no"/>
+	<title>IOS7 + Safari Issue Fix</title>
+	<style>
+		html, body { width: 100%; height: 150%; margin: 0; padding: 0; }
+		.container {
+			position: fixed;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+		}
+		.top-bar, .bottom-bar {
+			position: fixed;
+			left: 0;
+			width: 100%;
+			height: 40px;
+		}
+		.top-bar { top: 0; background-color: red; }
+		.bottom-bar { bottom: 0; background-color: blue; color: white; text-align: center; line-height: 40px; }
+	</style>
+	<script>
+		/**
+		 * This fix should only be applied when your content is shown. In my case it was a modal so this script is only executed
+		 * on Safari on IOS7 when my modal is shown and stopped once the modal is closed.
+		 */
+		(function(){
+			var ios7bars = null, // Variable to hold the state of the address and bookmarks bar so the event is triggered only once per state once.
+					refresh = function(){ // This function forces Safari to redraw the page and triggers the window resize event that was removed.
+						window.scrollTo(0, document.body.scrollTop);
+						window.dispatchEvent(new Event('resize'));
+					};
+
+			setInterval(function(){
+				var landscape = window.orientation == 90 || window.orientation == -90,
+						viewportHeight = window.innerHeight,
+				// The testHeight is based off the actual screen height multiplied by a fudge factor that allows for the status and mini address bar in portrait mode and the fullscreen in landscape mode.
+						testHeight = (landscape ? screen.availWidth : screen.availHeight) * 0.85;
+
+				if ((ios7bars == null || ios7bars == false) && ((landscape && viewportHeight < testHeight) || (!landscape && viewportHeight < testHeight))){
+					ios7bars = true;
+					refresh();
+				} else if ((ios7bars == null || ios7bars == true) && ((landscape && viewportHeight > testHeight) || (!landscape && viewportHeight > testHeight))) {
+					ios7bars = false;
+					refresh();
+				}
+			}, 500); // To get a better response to the bars being toggled you can lower the interval however the lower you go the more page performance on a whole may slow down.
+		})();
+	</script>
+</head>
+<body>
+<div class="container">
+	<div class="top-bar"></div>
+	<div class="bottom-bar">Try tap this bottom bar.</div>
+</div>
+</body>
+</html>
