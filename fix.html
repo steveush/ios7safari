@@ -29,7 +29,7 @@
 		(function(){
 			var ios7bars = null, // Variable to hold the state of the address and bookmarks bar so the event is triggered only once per state once.
 					refresh = function(){ // This function forces Safari to redraw the page and triggers the window resize event that was removed.
-						window.scrollTo(0, document.body.scrollTop);
+						window.scrollTo(document.body.scrollLeft, document.body.scrollTop);
 						window.dispatchEvent(new Event('resize'));
 					};
 
